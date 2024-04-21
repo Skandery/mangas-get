@@ -39,7 +39,7 @@ def clean_name(name):
     str
         La chaine purgée des tous les caractères non désirés.
     """
-    chars = '\\/:*<>?"|'
+    chars = ':*<>?"|'
     for c in chars:
         name = name.replace(c, "_")
     name = re.sub(r"\s+", " ", name)
