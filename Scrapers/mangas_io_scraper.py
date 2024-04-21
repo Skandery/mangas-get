@@ -8,6 +8,9 @@ from urllib.parse import urlparse
 import sys
 import time
 from tabulate import tabulate
+import sqlite3
+import datetime
+
 
 class MangasIoScraper(Scraper):
     """
@@ -178,11 +181,6 @@ class MangasIoScraper(Scraper):
                 
                 if force_title:
                     title_used = self.replace_title(force_title)
-                if not outputfile:
-                    print(f"# {title_used}")
-                else:
-                    with open(outputfile, "a", encoding="utf-8") as f:
-                        f.write(f"# {title_used}\n")
                 if not chapter["isSeparator"]:
                     if not outputfile:
                         print(f"https://www.mangas.io/lire/{slug}/{chapter['number']}/1")
@@ -231,11 +229,11 @@ class MangasIoScraper(Scraper):
         return True
 
     def replace_title(self, title):
-        new_title = title.replace("/", "¤")
+        new_title = title.replace("/", "_")
         for elem in self.infos:
             new_title = new_title.replace(elem[1], str(elem[2]))
         new_title = Scrapers.scraper.clean_name(new_title)
-        new_title = new_title.replace("¤", "/")
+        new_title = new_title.replace("_", "/")
         return new_title
 
     def download(
@@ -257,11 +255,16 @@ class MangasIoScraper(Scraper):
         self.get_pages()
         if not self.pages:
             print("Erreur : Aucune page trouvée")
+            with open("manquant.txt", "a") as file:
+                file.write(self.url + "\n")
             return False
         if len(self.pages) != self.page_count:
             print(f"Attention : {self.page_count} pages attendues, mais {len(self.pages)} annoncées")
             if full_only:
+                with open("manquant.txt", "a") as file:
+                    file.write(self.url + "\n")
                 return False
+                
         title_used = self.get_title()
         folder_used = title_used
         if force_title:
