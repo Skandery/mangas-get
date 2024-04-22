@@ -54,7 +54,7 @@ class MangasIoScraper:
         with open(outputfile, "a") as f:
             for volume in data["data"]["manga"]["volumes"]:
                 for chapter in volume["chapters"]:
-                    chapter_url = f'https://www.mangas.io/manga/{slug}/{chapter["number"]}'
+                    chapter_url = f'https://www.mangas.io/lire/{slug}/{chapter["number"]}/1'
                     c.execute("SELECT * FROM chapters WHERE chapter_url=?", (chapter_url,))
                     result = c.fetchone()
                     if result is None:
