@@ -62,11 +62,10 @@ class MangasIoScraper:
                         c.execute("INSERT INTO chapters VALUES (?, ?)", (chapter_url, current_date))
                         f.write(f'{chapter_url}\n')
         if new_chapters:
-            print(f"New chapter URLs appended to {outputfile}")
+            print(f"New chapter URLs appended to {outputfile}, form {slug}")
         else:
             # If no new chapters were found, clear the output file
-            open(outputfile, 'w').close()
-            print(f"No new chapters found. {outputfile} has been cleared.")
+            print(f"No new chapters found , form {slug}. {outputfile} has been cleared.")
 
         conn.commit()
         conn.close()
