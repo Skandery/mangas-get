@@ -178,6 +178,7 @@ class MangasIoScraper(Scraper):
                 self.infos.append(["Chapitre", "%chapter_title%", self.chapter_title])
                 self.infos.append(["Nombre de pages", "%pages%", self.page_count])
                 self.infos.append(["Nom du fichier par défaut", "%default%", self.get_title()])
+                print(slug)
                 
                 if force_title:
                     title_used = self.replace_title(force_title)
@@ -229,11 +230,11 @@ class MangasIoScraper(Scraper):
         return True
 
     def replace_title(self, title):
-        new_title = title.replace("/", "_")
+        new_title = title.replace("/", "¤")
         for elem in self.infos:
             new_title = new_title.replace(elem[1], str(elem[2]))
         new_title = Scrapers.scraper.clean_name(new_title)
-        new_title = new_title.replace("_", "/")
+        new_title = new_title.replace("¤", "/")
         return new_title
 
     def download(
