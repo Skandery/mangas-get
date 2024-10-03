@@ -205,22 +205,16 @@ if __name__ == "__main__":
 
     url_list = []
     if os.path.isfile(url):
-        # if encoding:
-        #     with open(url, "r", encoding=encoding) as f:
-        #         lines = f.readlines()
-        # else:
         with open(url, "r", encoding='utf-8') as f:
             lines = f.readlines()
         next_forced_title = ""
         for line in lines:
             line = line.strip()
-            # On cherche si on a un titre forcé.
-            res = ""
             if line and line.strip()[0] == "#":
-                res = line.strip()[1:].strip()
-            if res:
-                next_forced_title = res
+                next_forced_title = line.strip()[1:].strip()
             if line and line.strip()[0] != "#":
+                if not next_forced_title and force_title:
+                    next_forced_title = force_title
                 url_list.append([line, next_forced_title])
                 next_forced_title = ""
     else:

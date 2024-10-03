@@ -1,6 +1,6 @@
 import requests
-import argparse
 import os
+import csv
 import sqlite3
 from datetime import datetime
 
@@ -50,7 +50,7 @@ class MangasIoScraper:
         conn = sqlite3.connect(self.db_name)
         c = conn.cursor()
         current_date = datetime.now().strftime("%Y-%m-%d")
-        
+
         with open(outputfile, "a") as f:
             for volume in data["data"]["manga"]["volumes"]:
                 for chapter in volume["chapters"]:
@@ -69,24 +69,32 @@ class MangasIoScraper:
 
         conn.commit()
         conn.close()
-        
-        print(f"New chapter URLs appended to {outputfile}")
+
+        return data["data"]["manga"]["isOngoing"]
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Script to get the chapter list of a manga from Mangas.io.")
-    parser.add_argument("input", type=str, help="The URL of the manga or the path to a text file containing URLs")
     outputfile = "nouveau.txt"
     dbname = "mangasio.db"
-    args = parser.parse_args()
-    
+    csvfile = "listeserie.csv"
+
     scraper = MangasIoScraper(dbname)
-    
-    if os.path.isfile(args.input):
-        with open(args.input, "r") as f:
-            urls = f.read().splitlines()
-        for url in urls:
-            slug = url.split("/")[-1]
-            scraper.get_chapter_list(slug, outputfile)
-    else:
-        slug = args.input.split("/")[-1]
-        scraper.get_chapter_list(slug, outputfile)
+
+    updated_rows = []
+    with open(csvfile, mode='r') as infile:
+        reader = csv.reader(infile)
+        next(reader)  # Skip header row
+        for row in reader:
+            url, ongoing = row
+            if ongoing.lower() == 'true':
+                slug = url.split("/")[-2]
+                isOngoing = scraper.get_chapter_list(slug, outputfile)
+                updated_rows.append([url, isOngoing])
+                if isOngoing != 'true':
+                    print("-----------------------------------------------------------",slug)
+            else:
+                updated_rows.append([url, ongoing])
+
+    with open(csvfile, mode='w', newline='') as outfile:
+        writer = csv.writer(outfile)
+        writer.writerow(['url', 'ongoing'])
+        writer.writerows(updated_rows)
